@@ -28,6 +28,10 @@ Parallel.each(shard_ids, in_threads: shard_ids.count) do |shard_id|
   shard_iterator = shard_iterator_info.shard_iterator
 
   current_iterator = shard_iterator
+  count = 0
+  sum = 0
+  average = 0
+  max = 0
   loop do
     records_info = client.get_records(
                      shard_iterator: current_iterator
@@ -37,7 +41,11 @@ Parallel.each(shard_ids, in_threads: shard_ids.count) do |shard_id|
     records_info.records.each do |record|
       from = record.data.to_i
       delay = (Time.now.to_f * 1000).to_i - from
-      puts "Sequence Number: #{record.sequence_number}, Data: #{record.data}, Delay: #{delay}, Shard Id: #{shard_id}"
+      sum = sum + delay
+      average = (average * count + delay) / (count + 1)
+      count = count + 1
+      max = [max, delay].max
+      puts "Count: #{count}, Sequence Number: #{record.sequence_number}, Data: #{record.data}, Delay: #{delay}, Average: #{average}, Max: #{max}, Shard Id: #{shard_id}"
     end
     sleep 0.1
   end

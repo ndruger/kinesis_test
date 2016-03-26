@@ -23,5 +23,5 @@ loop do
     partition_key: t.to_s,
   )
   puts "Sequence Number: #{response.sequence_number}, Data: #{data}, Shard Id: #{response.shard_id}"
-  sleep 1
+  sleep 0.1
 end
